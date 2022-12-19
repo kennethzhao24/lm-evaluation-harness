@@ -15,16 +15,17 @@ Features:
 
 ## Install
 
-```bash
-pip install lm-eval
+```
+git clone https://github.com/kennethzhao24/lm-evaluation-harness
+cd lm-evaluation-harness
+pip install -r requirements.txt
 ```
 
-To install additional multlingual tokenization and text segmenation packages, you must install the package with the `multilingual` extra:
-
-```bash
-pip install "lm-eval[multilingual]"
+## Evalute OPT on Downstream Tasks
 ```
-
+sh run.sh
+```
+You can change pretrained path in the script.
 ## Basic Usage
 
 > **Note**: When reporting results from eval harness, please include the task versions (shown in `results["versions"]`) for reproducibility. This allows bug fixes to tasks while also ensuring that previously reported scores are reproducible. See the [Task Versioning](#task-versioning) section for more info.
