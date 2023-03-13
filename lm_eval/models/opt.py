@@ -17,6 +17,26 @@ def check_for_weight_keys(ckpt):
     return new_state_dict
 
 
+def load_pretrained(ckpt, model):
+    # save keys from model and pretrained weights
+    model_keys = []
+    for k, _ in model.state_dict().items():
+        model_keys.append(k)
+    weight_keys = []
+    for k, _ in ckpt.items():
+        weight_keys.append(k)
+    # make sure dictionary size match
+    assert len(weight_keys) == len(model_keys)
+    
+    new_weight = OrderedDict()
+    for i in range(len(weight_keys)):
+        # make sure weight shape size match
+        assert ckpt[weight_keys[i]].shape == model.state_dict()[model_keys[i]].shape
+        name = model_keys[i]
+        new_weight[name] = model.state_dict()[model_keys[i]]
+    model.load_state_dict(new_weight)
+
+
 class OPT(BaseLM):
     def __init__(
         self,
@@ -24,7 +44,7 @@ class OPT(BaseLM):
         model_name=None,
         config_file=None,
         pretrained=None,
-        tokenizer_file='/home/youpengzhao/code/accelarating-opt-main/data/20B_tokenizer.json',
+        tokenizer_file='/home/youpengzhao/code/GitHub/lm-evaluation-harness/lm_eval/models/20B_tokenizer.json',
         batch_size=1,
     ):
         super().__init__()
@@ -70,10 +90,17 @@ class OPT(BaseLM):
 
         if pretrained is not None:
             ckpt = torch.load(pretrained, map_location='cpu')
-            ckpt = check_for_weight_keys(ckpt)
-            self.opt.load_state_dict(ckpt)
+            load_pretrained(ckpt, self.opt)
+            # ckpt = check_for_weight_keys(ckpt)
+            # self.opt.load_state_dict(ckpt)
         
-        self.opt.to(self.device)
+        # perform 8-bit quantization
+        # self.opt = torch.quantization.quantize_dynamic(
+        #     self.opt, 
+        #     {torch.nn.Linear}, 
+        #     dtype=torch.qint8)
+        
+        self.opt.to(self._device)
         self.opt.eval()
 
         # multithreading and batching

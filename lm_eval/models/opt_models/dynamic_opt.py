@@ -1,7 +1,7 @@
 """ 
-    Dynamic OPT Model.
+     OPT Transformer Model.
 """
-from typing import List, Optional, Tuple
+from typing import Optional, Tuple
 
 
 import torch
@@ -294,6 +294,52 @@ class OPTBlock(nn.Module):
         return hidden_states, all_hidden_states, all_self_attns
 
 
+class OPTBlockWS(nn.Module):
+    """
+        Transformer Block w/ parameter sharing
+    """
+    def __init__(self,
+                 num_layers: int,
+                 hidden_size: int,
+                 head_dim: int,
+                 ffn_dim: int,
+                 attention_dropout: float = 0.0,
+                 dropout: float = 0.0,
+                 activation_function: str = "relu"):
+        super().__init__()
+
+        self.num_layers = num_layers
+        self.layer = OPTLayer(hidden_size, head_dim, ffn_dim, attention_dropout, dropout, activation_function)
+
+    def forward(
+        self,
+        hidden_states: torch.Tensor,
+        attention_mask: Optional[torch.Tensor] = None,
+        output_hidden_states: Optional[bool] = False,
+        output_attentions: Optional[bool] = False,
+        use_cache: Optional[bool] = False):
+
+        all_hidden_states = ()
+        all_self_attns = ()
+
+        for _ in range(self.num_layers):
+            if output_hidden_states:
+                all_hidden_states += (hidden_states,)
+
+            outputs = self.layer(hidden_states,
+                            attention_mask=attention_mask,
+                            output_attentions=output_attentions,
+                            use_cache=use_cache)
+
+            hidden_states = outputs[0]
+
+            if output_attentions:
+                all_self_attns += (outputs[1],)
+        
+        return hidden_states, all_hidden_states, all_self_attns
+
+
+
 
 class OPTDecoder(nn.Module):
     def __init__(self, config):
@@ -322,14 +368,24 @@ class OPTDecoder(nn.Module):
 
         self.final_layer_norm = nn.LayerNorm(config.hidden_size[-1])
 
-        self.blocks = nn.ModuleList([OPTBlock(config.layers_per_block[i],
-                                              config.hidden_size[i],
-                                              config.head_dim,
-                                              config.ffn_dim[i],
-                                              config.attention_dropout,
-                                              config.dropout,
-                                              config.activation_function)
-                                              for i in range(config.num_blocks)])
+        if config.weight_sharing:
+            self.blocks = nn.ModuleList([OPTBlockWS(config.layers_per_block[i],
+                                                config.hidden_size[i],
+                                                config.head_dim,
+                                                config.ffn_dim[i],
+                                                config.attention_dropout,
+                                                config.dropout,
+                                                config.activation_function)
+                                                for i in range(config.num_blocks)])        
+        else:
+            self.blocks = nn.ModuleList([OPTBlock(config.layers_per_block[i],
+                                                config.hidden_size[i],
+                                                config.head_dim,
+                                                config.ffn_dim[i],
+                                                config.attention_dropout,
+                                                config.dropout,
+                                                config.activation_function)
+                                                for i in range(config.num_blocks)])
         
         self.block_proj = nn.ModuleList([nn.Identity() for i in range(config.num_blocks)])
 
