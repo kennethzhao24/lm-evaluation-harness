@@ -2,7 +2,7 @@ import json
 import torch
 from collections import OrderedDict
 from types import SimpleNamespace
-from transformers import AutoConfig, PreTrainedTokenizerFast
+from transformers import AutoConfig, AutoTokenizer, PreTrainedTokenizerFast
 
 from lm_eval.base import BaseLM
 
@@ -41,16 +41,17 @@ class OPT(BaseLM):
     def __init__(
         self,
         device="cuda",
+        quantization=False,
         model_name=None,
         config_file=None,
         pretrained=None,
-        tokenizer_file='/home/youpengzhao/code/GitHub/lm-evaluation-harness/lm_eval/models/20B_tokenizer.json',
+        tokenizer_file='./lm_eval/20B_tokenizer.json',
         batch_size=1,
     ):
         super().__init__()
 
         assert isinstance(device, str)
-        assert isinstance(pretrained, str)
+        # assert isinstance(pretrained, str)
         assert isinstance(batch_size, int)
 
         if device:
@@ -75,30 +76,42 @@ class OPT(BaseLM):
         if model_name is not None:
             from .opt_models.opt_pytorch import OPTForCausalLM
             config = AutoConfig.from_pretrained(model_name)
+            tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
+            self.opt = OPTForCausalLM.from_pretrained(
+                model_name,
+                from_tf=bool(".ckpt" in model_name),
+                config=config)
+            print('Load {} model'.format(model_name))
+
         else:
             from .opt_models.dynamic_opt import OPTForCausalLM
+            tokenizer = PreTrainedTokenizerFast(tokenizer_file=tokenizer_file)
+            tokenizer.pad_token_id = 1
             # load model config
             with open(config_file) as f:
                 data = json.loads(f.read())
-            config = SimpleNamespace(**data)
-        
-        # change vocab size to match 20B tokenizer
-        config.vocab_size = 50277
+            config = SimpleNamespace(**data)        
+            # change vocab size to match 20B tokenizer
+            config.vocab_size = 50277
+            self.opt = OPTForCausalLM(config)
+            if pretrained is not None:
+                ckpt = torch.load(pretrained, map_location='cpu')
+                load_pretrained(ckpt, self.opt)
+                # ckpt = check_for_weight_keys(ckpt)
+                # self.opt.load_state_dict(ckpt)
+            print('Load OPT Transformer model')
+
+
         self.config = config
+        self.tokenizer = tokenizer
 
-        self.opt = OPTForCausalLM(config)
-
-        if pretrained is not None:
-            ckpt = torch.load(pretrained, map_location='cpu')
-            load_pretrained(ckpt, self.opt)
-            # ckpt = check_for_weight_keys(ckpt)
-            # self.opt.load_state_dict(ckpt)
-        
-        # perform 8-bit quantization
-        # self.opt = torch.quantization.quantize_dynamic(
-        #     self.opt, 
-        #     {torch.nn.Linear}, 
-        #     dtype=torch.qint8)
+        if quantization:
+            print('Perform 8-bit Quantization')
+            # perform 8-bit quantization
+            self.opt = torch.quantization.quantize_dynamic(
+                self.opt, 
+                {torch.nn.Linear}, 
+                dtype=torch.qint8)
         
         self.opt.to(self._device)
         self.opt.eval()
