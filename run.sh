@@ -1,4 +1,4 @@
-rm -r lm_cache
+#!/bin/bash
 
 python main.py \
    --model opt \
