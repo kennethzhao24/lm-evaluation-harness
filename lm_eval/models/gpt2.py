@@ -12,6 +12,7 @@ class HFLM(BaseLM):
         subfolder=None,
         tokenizer=None,
         batch_size=1,
+        quantization=True,
     ):
         super().__init__()
 

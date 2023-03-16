@@ -1,13 +1,21 @@
 #!/bin/bash
 
 python main.py \
-   --model opt \
-   --batch_size 8 \
-   --model_args config_file=/home/youpengzhao/code/pretrained/opt-125m/config.json,pretrained=/home/youpengzhao/code/pretrained/opt-125m/opt_final.pth \
-   --num_fewshot 1 \
-   --device cpu \
-   --tasks rte \
-   --quantization
+   --model gpt2 \
+   --batch_size 16 \
+   --model_args pretrained=gpt2 \
+   --num_fewshot 0 \
+   --device 0 \
+   --tasks hellaswag,piqa,arc_easy,arc_challenge,openbookqa,winogrande,boolq,cb,copa,wic,wsc,multirc,rte,record
+
+# python main.py \
+#    --model opt \
+#    --batch_size 8 \
+#    --model_args config_file=/home/youpengzhao/code/pretrained/opt-125m/config.json,pretrained=/home/youpengzhao/code/pretrained/opt-125m/opt_final.pth \
+#    --num_fewshot 1 \
+#    --device cpu \
+#    --tasks rte \
+#    --quantization
 
 # python main.py \
 #    --model opt \
