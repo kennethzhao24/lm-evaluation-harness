@@ -1,7 +1,17 @@
-import transformers
 import torch
+import transformers
+from collections import OrderedDict
 from lm_eval.base import BaseLM
 
+def check_for_weight_keys(ckpt):
+    new_state_dict = OrderedDict()
+    for k, v in ckpt.items():
+        if k[:6] == 'module':               
+            name = k[7:] # remove `module.`
+        else:
+            name = k
+        new_state_dict[name] = v
+    return new_state_dict
 
 class HFLM(BaseLM):
     def __init__(
@@ -12,6 +22,7 @@ class HFLM(BaseLM):
         subfolder=None,
         tokenizer=None,
         batch_size=1,
+        tokenizer_file='./lm_eval/20B_tokenizer.json',
         quantization=True,
     ):
         super().__init__()
@@ -37,26 +48,43 @@ class HFLM(BaseLM):
         # TODO: update this to be less of a hack once subfolder is fixed in HF
         revision = revision + ("/" + subfolder if subfolder is not None else "")
 
-        self.gpt2 = transformers.AutoModelForCausalLM.from_pretrained(
-            pretrained,
-            revision=revision,
-        ).to(self.device)
+        if pretrained != 'gpt2':
+            # load 20B tokenizer
+            tokenizer = transformers.PreTrainedTokenizerFast(tokenizer_file=tokenizer_file)
+            tokenizer.pad_token_id = 1
+            self.tokenizer = tokenizer
+            # load gpt2 config
+            config = transformers.AutoConfig.from_pretrained('gpt2')
+            config.vocab_size = 50277
+            config.pad_token_id = 1
+            # load gpt2 model
+            ckpt = torch.load(pretrained, map_location='cpu')
+            ckpt = check_for_weight_keys(ckpt)
+            self.gpt2 = transformers.AutoModelForCausalLM.from_config(config)
+            self.gpt2.load_state_dict(ckpt)
+            self.gpt2.config = config
+        else:
+            self.gpt2 = transformers.AutoModelForCausalLM.from_pretrained(
+                pretrained,
+                revision=revision,
+            )
+            self.tokenizer = transformers.AutoTokenizer.from_pretrained(
+                pretrained if tokenizer is None else tokenizer,
+                revision=revision,
+            )
+        
+        self.gpt2.to(self.device)
         self.gpt2.eval()
 
-        self.tokenizer = transformers.AutoTokenizer.from_pretrained(
-            pretrained if tokenizer is None else tokenizer,
-            revision=revision,
-        )
-
-        assert isinstance(
-            self.tokenizer,
-            (
-                transformers.GPT2Tokenizer,
-                transformers.GPT2TokenizerFast,
-                transformers.T5Tokenizer,
-                transformers.T5TokenizerFast,
-            ),
-        ), "this tokenizer has not been checked for compatibility yet!"
+        # assert isinstance(
+        #     self.tokenizer,
+        #     (
+        #         transformers.GPT2Tokenizer,
+        #         transformers.GPT2TokenizerFast,
+        #         transformers.T5Tokenizer,
+        #         transformers.T5TokenizerFast,
+        #     ),
+        # ), "this tokenizer has not been checked for compatibility yet!"
 
         self.vocab_size = self.tokenizer.vocab_size
 
@@ -86,6 +114,7 @@ class HFLM(BaseLM):
     @property
     def max_length(self):
         try:
+            return self.config.n_ctx
             return self.gpt2.config.n_ctx
         except AttributeError:
             # gptneoconfig doesn't have n_ctx apparently
