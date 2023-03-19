@@ -11,7 +11,7 @@ python main.py \
    --model_args pretrained=/home/youpengzhao/code/pretrained/GPT2/gpt_final.pth \
    --num_fewshot 0 \
    --device 0 \
-   --tasks rte
+   --tasks hellaswag,piqa,arc_easy,arc_challenge,openbookqa,winogrande,boolq,cb,copa,wic,wsc,multirc,rte,record
 
 
 # python main.py \

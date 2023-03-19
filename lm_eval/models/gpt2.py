@@ -57,6 +57,7 @@ class HFLM(BaseLM):
             config = transformers.AutoConfig.from_pretrained('gpt2')
             config.vocab_size = 50277
             config.pad_token_id = 1
+            self.vocab_size = config.vocab_size
             # load gpt2 model
             ckpt = torch.load(pretrained, map_location='cpu')
             ckpt = check_for_weight_keys(ckpt)
@@ -72,6 +73,7 @@ class HFLM(BaseLM):
                 pretrained if tokenizer is None else tokenizer,
                 revision=revision,
             )
+            self.vocab_size = self.tokenizer.vocab_size
         
         self.gpt2.to(self.device)
         self.gpt2.eval()
@@ -85,8 +87,6 @@ class HFLM(BaseLM):
         #         transformers.T5TokenizerFast,
         #     ),
         # ), "this tokenizer has not been checked for compatibility yet!"
-
-        self.vocab_size = self.tokenizer.vocab_size
 
         if isinstance(
             self.tokenizer, (transformers.GPT2Tokenizer, transformers.GPT2TokenizerFast)
@@ -114,7 +114,6 @@ class HFLM(BaseLM):
     @property
     def max_length(self):
         try:
-            return self.config.n_ctx
             return self.gpt2.config.n_ctx
         except AttributeError:
             # gptneoconfig doesn't have n_ctx apparently
@@ -149,7 +148,7 @@ class HFLM(BaseLM):
         logits returned from the model
         """
         with torch.no_grad():
-            return self.gpt2(inps)[0][:, :, :50257]
+            return self.gpt2(inps)[0][:, :, :self.vocab_size]
 
     def _model_generate(self, context, max_length, eos_token_id):
         return self.gpt2.generate(
