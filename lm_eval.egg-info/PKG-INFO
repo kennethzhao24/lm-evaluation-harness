@@ -74,6 +74,15 @@ python main.py \
    --tasks rte \
    --quantization
 ```
+For GPT-2 eval
+```bash
+python main.py \
+   --model gpt2 \
+   --model_args pretrained=/home/youpengzhao/code/pretrained/GPT2/gpt_final.pth \
+   --num_fewshot 0 \
+   --device 0 \
+   --tasks rte
+```
 
 ## Cite as
 

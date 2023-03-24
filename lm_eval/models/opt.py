@@ -17,24 +17,24 @@ def check_for_weight_keys(ckpt):
     return new_state_dict
 
 
-def load_pretrained(ckpt, model):
-    # save keys from model and pretrained weights
-    model_keys = []
-    for k, _ in model.state_dict().items():
-        model_keys.append(k)
-    weight_keys = []
-    for k, _ in ckpt.items():
-        weight_keys.append(k)
-    # make sure dictionary size match
-    assert len(weight_keys) == len(model_keys)
+# def load_pretrained(ckpt, model):
+#     # save keys from model and pretrained weights
+#     model_keys = []
+#     for k, _ in model.state_dict().items():
+#         model_keys.append(k)
+#     weight_keys = []
+#     for k, _ in ckpt.items():
+#         weight_keys.append(k)
+#     # make sure dictionary size match
+#     assert len(weight_keys) == len(model_keys)
     
-    new_weight = OrderedDict()
-    for i in range(len(weight_keys)):
-        # make sure weight shape size match
-        assert ckpt[weight_keys[i]].shape == model.state_dict()[model_keys[i]].shape
-        name = model_keys[i]
-        new_weight[name] = model.state_dict()[model_keys[i]]
-    model.load_state_dict(new_weight)
+#     new_weight = OrderedDict()
+#     for i in range(len(weight_keys)):
+#         # make sure weight shape size match
+#         assert ckpt[weight_keys[i]].shape == model.state_dict()[model_keys[i]].shape
+#         name = model_keys[i]
+#         new_weight[name] = ckpt[weight_keys[i]]
+#     model.load_state_dict(new_weight)
 
 
 class OPT(BaseLM):
@@ -68,19 +68,23 @@ class OPT(BaseLM):
                 else torch.device("cpu")
             )
 
-        # load tokenizer
-        tokenizer = PreTrainedTokenizerFast(tokenizer_file=tokenizer_file)
-        tokenizer.pad_token_id = 1
-        self.tokenizer = tokenizer
-
         if model_name is not None:
             from .opt_models.opt_pytorch import OPTForCausalLM
             config = AutoConfig.from_pretrained(model_name)
             tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
-            self.opt = OPTForCausalLM.from_pretrained(
-                model_name,
-                from_tf=bool(".ckpt" in model_name),
-                config=config)
+            if pretrained is not None:
+                config.vocab_size = 50277
+                self.opt = OPTForCausalLM(config)
+                ckpt = torch.load(pretrained, map_location='cpu')
+                ckpt = check_for_weight_keys(ckpt)
+                self.opt.load_state_dict(ckpt)
+                print('Load Pretrained Weights')
+            else:
+                self.opt = OPTForCausalLM.from_pretrained(
+                    model_name,
+                    from_tf=bool(".ckpt" in model_name),
+                    config=config)
+                print('Load Official Weights')
             print('Load {} model'.format(model_name))
 
         else:
@@ -96,9 +100,10 @@ class OPT(BaseLM):
             self.opt = OPTForCausalLM(config)
             if pretrained is not None:
                 ckpt = torch.load(pretrained, map_location='cpu')
-                load_pretrained(ckpt, self.opt)
-                # ckpt = check_for_weight_keys(ckpt)
-                # self.opt.load_state_dict(ckpt)
+                # load_pretrained(ckpt, self.opt)
+                ckpt = check_for_weight_keys(ckpt)
+                self.opt.load_state_dict(ckpt)
+                print('Load Pretrained Weights')
             print('Load OPT Transformer model')
 
 
