@@ -74,7 +74,7 @@ class HFLM(BaseLM):
                 revision=revision,
             )
             self.vocab_size = self.tokenizer.vocab_size
-        
+            
         self.gpt2.to(self.device)
         self.gpt2.eval()
 

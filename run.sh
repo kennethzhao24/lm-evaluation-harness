@@ -5,10 +5,36 @@
 # fi
 
 
+# python main.py \
+#    --model opt \
+#    --batch_size 16 \
+#    --model_args model_name=facebook/opt-125m,pretrained=/home/yzhao2/pretrained/125M/opt_final.pth \
+#    --num_fewshot 0 \
+#    --device 0 \
+#    --tasks hellaswag,piqa,arc_easy,arc_challenge,openbookqa,winogrande,boolq,cb,copa,wic,wsc,rte
+
+# python main.py \
+#    --model opt \
+#    --batch_size 16 \
+#    --model_args config_file=/home/yzhao2/Entropy-Transformer-Design/results_pile/zad_60m_150k/config.json,pretrained=/home/yzhao2/Entropy-Transformer-Design/results_pile/zad_60m_150k/opt_final.pth \
+#    --num_fewshot 0 \
+#    --device 0 \
+#    --tasks hellaswag,piqa,arc_easy,arc_challenge,openbookqa,winogrande,boolq,cb,copa,wic,wsc,rte
+
+
+# python main.py \
+#    --model opt \
+#    --batch_size 16 \
+#    --model_args config_file=/home/yzhao2/Entropy-Transformer-Design/results_pile/zad_100m_200k/config.json,pretrained=/home/yzhao2/Entropy-Transformer-Design/results_pile/zad_100m_200k/opt_final.pth \
+#    --num_fewshot 0 \
+#    --device 0 \
+#    --tasks hellaswag,piqa,arc_easy,arc_challenge,openbookqa,winogrande,boolq,cb,copa,wic,wsc,rte
+
+
 python main.py \
    --model opt \
    --batch_size 16 \
-   --model_args config_file=/home/yzhao2/Entropy-Transformer-Design/results_pile/zad_60m_150k/config.json,pretrained=/home/yzhao2/Entropy-Transformer-Design/results_pile/zad_60m_150k/opt_60000.pth \
+   --model_args config_file=/home/yzhao2/pretrained/60M/config.json,pretrained=/home/yzhao2/pretrained/60M/opt_60000.pth \
    --num_fewshot 0 \
    --device 0 \
    --tasks hellaswag,piqa,arc_easy,arc_challenge,openbookqa,winogrande,boolq,cb,copa,wic,wsc,rte
@@ -16,7 +42,7 @@ python main.py \
 python main.py \
    --model opt \
    --batch_size 16 \
-   --model_args config_file=/home/yzhao2/Entropy-Transformer-Design/results_pile/zad_60m_150k/config.json,pretrained=/home/yzhao2/Entropy-Transformer-Design/results_pile/zad_60m_150k/opt_90000.pth \
+   --model_args config_file=/home/yzhao2/pretrained/60M/config.json,pretrained=/home/yzhao2/pretrained/60M/opt_final.pth \
    --num_fewshot 0 \
    --device 0 \
    --tasks hellaswag,piqa,arc_easy,arc_challenge,openbookqa,winogrande,boolq,cb,copa,wic,wsc,rte
@@ -24,10 +50,51 @@ python main.py \
 python main.py \
    --model opt \
    --batch_size 16 \
-   --model_args config_file=/home/yzhao2/Entropy-Transformer-Design/results_pile/zad_60m_150k/config.json,pretrained=/home/yzhao2/Entropy-Transformer-Design/results_pile/zad_60m_150k/opt_120000.pth \
+   --model_args config_file=/home/yzhao2/pretrained/60M_WS/config.json,pretrained=/home/yzhao2/pretrained/60M_WS/opt_60000.pth \
    --num_fewshot 0 \
    --device 0 \
-   --tasks hellaswag,piqa,arc_easy,arc_challenge,openbookqa,winogrande,boolq,cb,copa,wic,wsc,rte 
+   --tasks hellaswag,piqa,arc_easy,arc_challenge,openbookqa,winogrande,boolq,cb,copa,wic,wsc,rte
+
+python main.py \
+   --model opt \
+   --batch_size 16 \
+   --model_args config_file=/home/yzhao2/pretrained/60M_WS/config.json,pretrained=/home/yzhao2/pretrained/60M_WS/opt_final.pth \
+   --num_fewshot 0 \
+   --device 0 \
+   --tasks hellaswag,piqa,arc_easy,arc_challenge,openbookqa,winogrande,boolq,cb,copa,wic,wsc,rte
+
+# python main.py \
+#    --model opt \
+#    --batch_size 16 \
+#    --model_args config_file=/home/yzhao2/pretrained/100M/config.json,pretrained=/home/yzhao2/pretrained/100M/opt_60000.pth \
+#    --num_fewshot 0 \
+#    --device 0 \
+#    --tasks hellaswag,piqa,arc_easy,arc_challenge,openbookqa,winogrande,boolq,cb,copa,wic,wsc,rte
+
+
+# python main.py \
+#    --model opt \
+#    --batch_size 16 \
+#    --model_args config_file=/home/yzhao2/pretrained/80M/config.json,pretrained=/home/yzhao2/pretrained/80M/opt_final.pth \
+#    --num_fewshot 0 \
+#    --device 0 \
+#    --tasks hellaswag,piqa,arc_easy,arc_challenge,openbookqa,winogrande,boolq,cb,copa,wic,wsc,rte
+
+# python main.py \
+#    --model opt \
+#    --batch_size 16 \
+#    --model_args config_file=/home/yzhao2/Entropy-Transformer-Design/results_pile/zad_60m_150k/config.json,pretrained=/home/yzhao2/Entropy-Transformer-Design/results_pile/zad_60m_150k/opt_90000.pth \
+#    --num_fewshot 0 \
+#    --device 0 \
+#    --tasks hellaswag,piqa,arc_easy,arc_challenge,openbookqa,winogrande,boolq,cb,copa,wic,wsc,rte
+
+# python main.py \
+#    --model opt \
+#    --batch_size 16 \
+#    --model_args config_file=/home/yzhao2/Entropy-Transformer-Design/results_pile/zad_60m_150k/config.json,pretrained=/home/yzhao2/Entropy-Transformer-Design/results_pile/zad_60m_150k/opt_120000.pth \
+#    --num_fewshot 0 \
+#    --device 0 \
+#    --tasks hellaswag,piqa,arc_easy,arc_challenge,openbookqa,winogrande,boolq,cb,copa,wic,wsc,rte 
   
 
 # python main.py \
