@@ -1,8 +1,27 @@
 #!/bin/bash
 
-# if [ -d "lm_cache" ]; then
-#   rm -r lm_cache
-# fi
+if [ -d "lm_cache" ]; then
+  rm -r lm_cache
+fi
+
+TASK=$1
+
+
+python main.py \
+   --model gpt2 \
+   --batch_size 16 \
+   --model_args pretrained=gpt2-medium \
+   --num_fewshot 0 \
+   --device 0 \
+   --tasks $TASK
+
+# python main.py \
+#    --model opt \
+#    --batch_size 8 \
+#    --model_args model_name=facebook/opt-350m \
+#    --num_fewshot 0 \
+#    --device 0 \
+#    --tasks $TASK
 
 
 # python main.py \
@@ -31,37 +50,37 @@
 #    --tasks hellaswag,piqa,arc_easy,arc_challenge,openbookqa,winogrande,boolq,cb,copa,wic,wsc,rte
 
 
-python main.py \
-   --model opt \
-   --batch_size 16 \
-   --model_args config_file=/home/yzhao2/pretrained/60M/config.json,pretrained=/home/yzhao2/pretrained/60M/opt_60000.pth \
-   --num_fewshot 0 \
-   --device 0 \
-   --tasks hellaswag,piqa,arc_easy,arc_challenge,openbookqa,winogrande,boolq,cb,copa,wic,wsc,rte
+# python main.py \
+#    --model opt \
+#    --batch_size 8 \
+#    --model_args config_file=/home/youpengzhao/code/pretrained/opt-100m/config.json,pretrained=/home/youpengzhao/code/pretrained/opt-100m/opt_final.pth \
+#    --num_fewshot 0 \
+#    --device 1 \
+#    --tasks sciq
 
-python main.py \
-   --model opt \
-   --batch_size 16 \
-   --model_args config_file=/home/yzhao2/pretrained/60M/config.json,pretrained=/home/yzhao2/pretrained/60M/opt_final.pth \
-   --num_fewshot 0 \
-   --device 0 \
-   --tasks hellaswag,piqa,arc_easy,arc_challenge,openbookqa,winogrande,boolq,cb,copa,wic,wsc,rte
+# python main.py \
+#    --model opt \
+#    --batch_size 16 \
+#    --model_args config_file=/home/yzhao2/pretrained/60M/config.json,pretrained=/home/yzhao2/pretrained/60M/opt_final.pth \
+#    --num_fewshot 0 \
+#    --device 0 \
+#    --tasks hellaswag,piqa,arc_easy,arc_challenge,openbookqa,winogrande,boolq,cb,copa,wic,wsc,rte
 
-python main.py \
-   --model opt \
-   --batch_size 16 \
-   --model_args config_file=/home/yzhao2/pretrained/60M_WS/config.json,pretrained=/home/yzhao2/pretrained/60M_WS/opt_60000.pth \
-   --num_fewshot 0 \
-   --device 0 \
-   --tasks hellaswag,piqa,arc_easy,arc_challenge,openbookqa,winogrande,boolq,cb,copa,wic,wsc,rte
+# python main.py \
+#    --model opt \
+#    --batch_size 16 \
+#    --model_args config_file=/home/yzhao2/pretrained/60M_WS/config.json,pretrained=/home/yzhao2/pretrained/60M_WS/opt_60000.pth \
+#    --num_fewshot 0 \
+#    --device 0 \
+#    --tasks hellaswag,piqa,arc_easy,arc_challenge,openbookqa,winogrande,boolq,cb,copa,wic,wsc,rte
 
-python main.py \
-   --model opt \
-   --batch_size 16 \
-   --model_args config_file=/home/yzhao2/pretrained/60M_WS/config.json,pretrained=/home/yzhao2/pretrained/60M_WS/opt_final.pth \
-   --num_fewshot 0 \
-   --device 0 \
-   --tasks hellaswag,piqa,arc_easy,arc_challenge,openbookqa,winogrande,boolq,cb,copa,wic,wsc,rte
+# python main.py \
+#    --model opt \
+#    --batch_size 16 \
+#    --model_args config_file=/home/yzhao2/pretrained/60M_WS/config.json,pretrained=/home/yzhao2/pretrained/60M_WS/opt_final.pth \
+#    --num_fewshot 0 \
+#    --device 0 \
+#    --tasks hellaswag,piqa,arc_easy,arc_challenge,openbookqa,winogrande,boolq,cb,copa,wic,wsc,rte
 
 # python main.py \
 #    --model opt \

@@ -48,7 +48,7 @@ class HFLM(BaseLM):
         # TODO: update this to be less of a hack once subfolder is fixed in HF
         revision = revision + ("/" + subfolder if subfolder is not None else "")
 
-        if pretrained != 'gpt2':
+        if 'gpt2' not in pretrained:
             # load 20B tokenizer
             tokenizer = transformers.PreTrainedTokenizerFast(tokenizer_file=tokenizer_file)
             tokenizer.pad_token_id = 1
